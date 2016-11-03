@@ -17,37 +17,37 @@ class Entity
      * @var string $table
      */
 	public static $table;
-	
+
     /**
      * Clé primaire
      * @var string $primary_key
      */
 	public static $primary_key;
-	
+
     /**
      * Champs
      * @var array $fields
      */
 	public static $fields = array();
-	
+
     /**
      * Associations
      * @var array $associations
      */
 	public static $associations = array();
-	
+
     /**
      * Validations
      * @var array $validations
      */
 	public static $validations = array();
-	
+
     /**
      * Gestionnaire de configuration
-     * @var \Origami\Entity\Manager\Config 
+     * @var \Origami\Entity\Manager\Config
      */
     protected $_config;
-    
+
     /**
      * Gestionnaire de requête
      * @var \Origami\Entity\Manager\Query
@@ -71,7 +71,7 @@ class Entity
      * @var \Origami\Entity\Manager\Validator
      */
     protected $_validator;
-	
+
 	/**
 	 * Factory
 	 * @param string $name
@@ -98,10 +98,10 @@ class Entity
 	public static function origami()
     {
         $CI =& get_instance();
-		
+
 		return (isset($CI->origami) && $CI->origami instanceof \Origami) ? $CI->origami->getConfig() : array();
     }
-	
+
 	/**
      * Nom de la classe
      * @return string
@@ -120,7 +120,7 @@ class Entity
         $database = explode('\\', self::entity());
         return $database[1];
     }
-	
+
 	/**
      * Nom de la table
      * @return string
@@ -237,7 +237,7 @@ class Entity
             exit($error.PHP_EOL);
         }
     }
-    
+
     /**
      * Initialisateur
      * @param NULL|integer|\Origami\Entity\Schema\Association $data
@@ -337,7 +337,7 @@ class Entity
     {
         return json_encode($this->_storage->value());
     }
-    
+
     /**
      * Retourne le gestionnaire de configuration
      * @return Entity\Config
@@ -420,25 +420,23 @@ class Entity
     {
         // Options
         $options = array_merge(array(
+            'ignore' => FALSE,
             'replace' => FALSE,
             'force_insert' => FALSE
         ), $options);
-        
+
         // Clé primaire
         $field = $this->_storage->get($this->_config->getPrimaryKey());
         $field_value = $field->getValue();
-
         // Si la la requête doit être de type INSERT
         $has_insert = (empty($field_value) || $options['force_insert'] === TRUE);
-        
+
         // Si il y a pas de changement
         if ($this->_storage->dirty() === FALSE) {
             return FALSE;
         }
-
         // Etat de la requête
         $query = FALSE;
-
         // Si la requete est de type replace
         if ($options['replace']) {
             // Exécute la requête
@@ -446,45 +444,49 @@ class Entity
                 ->write()
                 ->from($this->_config->getTable())
                 ->replace();
-
             // Si l'insertion est correcte
             if ($query === TRUE) {
                 // Met a jour la clé primaire en silence
                 $this->_storage->set($field->getName(), $this->db()->insert_id(), TRUE);
             }
-
             // Si la requete est de type insert
         } else if ($has_insert === TRUE) {
             // Exécute la requête
             $query = $this
                 ->write()
-                ->from($this->_config->getTable())
-                ->insert();
+                ->from($this->_config->getTable());
 
+            if ($options['ignore']) {
+                $query = $query->insert_ignore();
+            } else {
+                $query = $query->insert();
+            }
             // Si l'insertion est correcte
             if ($query === TRUE) {
                 // Met a jour la clé primaire en silence
                 $this->_storage->set($field->getName(), $this->db()->insert_id(), TRUE);
             }
-
             // Si la requete est de type update
         } else {
             // Exécute la requête
             $query = $this
                 ->write()
                 ->from($this->_config->getTable())
-                ->where($field->getName(), $field->getValue())
-                ->update();
+                ->where($field->getName(), $field->getValue());
+
+            if ($options['ignore']) {
+                $query = $query->update_ignore();
+            } else {
+                $query = $query->update();
+            }
         }
-        
+
         // Change le status de l'entité
         if ($query === TRUE && $this->_storage->isNew()) {
             $this->_storage->isNew(FALSE);
         }
-
         // Vide les changements
         $this->_storage->clean();
-
         // La requête a échoué
         return $query;
     }
@@ -508,7 +510,7 @@ class Entity
             ->where($field->getName(), $value)
             ->delete($this->_config->getTable());
     }
-    
+
     /**
      * Retourne l'object db
      * @return type
