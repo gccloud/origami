@@ -108,13 +108,17 @@ class Origami
         return $this->version;
     }
 
-    public function addEntityPath($path = NULL) {
-        if( ! is_array($this->entity_path)) {
-            $this->entity_path = array($this->entity_path);
+    /**
+     * Ajoute un nouveau répertoire d'entités
+     * @author Gregory CARRODANO <g.carrodano@santiane.fr>
+     * @param  string
+     */
+    public function addEntityPath($path = NULL)
+    {
+        (is_array($this->entity_path)) or $this->entity_path = array($this->entity_path);
 
-            if( ! empty($path)) {
-                $this->entity_path[] = $path;
-            }
+        if( ! empty($path)) {
+            $this->entity_path[] = $path;
         }
     }
 

@@ -33,7 +33,7 @@ class Origami_generator extends CI_Controller {
         $config_origami = $this->config->item('origami');
 
         // Assignation du répértoire de génération des entités
-        $this->entity_path = (!empty($config_origami['entity_path'])) ? $config_origami['entity_path'] : APPPATH.'/models/Entity';
+        $this->entity_path = (!empty($config_origami['entity_path'])) ? $config_origami['entity_path'] : APPPATH.'/entities';
 
         // Paquet(s)
         $this->load->helper("text");

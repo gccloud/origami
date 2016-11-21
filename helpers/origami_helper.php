@@ -20,9 +20,8 @@ function origami_entity_autoload($class)
     if (substr($class, 0, $length) === $key) {
         $class = substr($class, $length);
         $entity_path = get_instance()->origami->getConfig('entity_path');
-        if( ! array($entity_path)) {
-            $entity_path = array($entity_path);
-        }
+
+        (is_array($entity_path)) or $entity_path = array($entity_path);
 
         foreach($entity_path as $path) {
             $file_path = str_replace('\\', '/', $path.'/'.$class.'.php');
