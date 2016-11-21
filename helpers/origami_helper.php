@@ -18,11 +18,18 @@ function origami_entity_autoload($class)
     $length = strlen($key);
 
     if (substr($class, 0, $length) === $key) {
-        $class = substr($class, $length);        
-        $file_path = str_replace('\\', '/', get_instance()->origami->getConfig('entity_path').'/'.$class.'.php');
-                
-        if (is_file($file_path)) {
-            include_once($file_path);
+        $class = substr($class, $length);
+        $entity_path = get_instance()->origami->getConfig('entity_path');
+        if( ! array($entity_path)) {
+            $entity_path = array($entity_path);
+        }
+
+        foreach($entity_path as $path) {
+            $file_path = str_replace('\\', '/', $path.'/'.$class.'.php');
+
+            if (is_file($file_path)) {
+                include_once($file_path);
+            }
         }
     }
 }

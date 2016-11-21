@@ -6,5 +6,6 @@ $config['origami'] = array(
     'entity_path' => APPPATH.'third_party/origami/models/Entity',
     'binary_enable' => TRUE,
     'encryption_enable' => TRUE,
-    'encryption_key' => bin2hex('Origami')
+    'encryption_key' => bin2hex('Origami'),
+    'exclude_tables' => NULL
 );

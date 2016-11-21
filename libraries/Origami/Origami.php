@@ -108,6 +108,16 @@ class Origami
         return $this->version;
     }
 
+    public function addEntityPath($path = NULL) {
+        if( ! is_array($this->entity_path)) {
+            $this->entity_path = array($this->entity_path);
+
+            if( ! empty($path)) {
+                $this->entity_path[] = $path;
+            }
+        }
+    }
+
 }
 
 /* End of file Origami.php */
